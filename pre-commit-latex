@@ -1,0 +1,80 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""That is a pre-commit hook to check spurious space in .dtx file
+It allows empty line, but not line not finished by %.
+"""
+
+import os
+import re
+import sys
+
+def add_bad_line(bad_lines,file,line_number,line):
+	"""Add a bad line to the list of bad lines"""
+	if file in bad_lines:
+		bad_lines[file].append((line_number,line))
+	else:
+		bad_lines[file] = [(line_number,line)]
+	return bad_lines
+
+def change_line_number(line_number,line):
+	"""Change line number, depending of the current line"""
+	if line[0:2] == "@@": # line number
+		line_number = re.findall("\+(\d+),",line)
+		line_number = int(line_number[0]) -1
+	elif not line[0] == "-" and not line[0:1] == "\\":
+		line_number = line_number + 1
+	return line_number 
+
+def check_lines():
+	""" Check all modified lines"""
+	diff = os.popen("git diff  --cached *dtx")
+	bad_lines ={}
+	line_number = 0
+	file = ""
+	
+	for line in diff:
+		line_number = change_line_number(line_number,line)
+		# what is the file?
+		if line[:6] == "+++ b/":
+			file = line[6:]
+		elif line[0] == "+":
+			check = check_line(line)
+			if not check:
+				bad_lines = add_bad_line(bad_lines,file,line_number,line)
+	return bad_lines
+
+def check_line(line):
+	"""Check individual added line"""
+	
+	line = line.replace("\%","")	# Don't look for protected %  
+	
+	if line == "\n": 			# Allow empty line
+		return True
+	
+	elif "%" not in line: 		# If not % -> problem
+		return False
+
+	elif re.search ("\s+%",line): # Spaces before % -> problem 
+		return False
+	else:
+		return True
+
+def print_bad_lines(bad_lines):
+	"""Print the bad_lines"""
+	for file in bad_lines:
+		print (file[:-1]+":")
+		for line in bad_lines[file]:
+			print ("\t l." + str(line[0]) + ": " + line[1][1:-1])
+	
+def __main__():
+	"""Main function: calls the check to bad line, print them if need, and return exit if error"""
+	bad_lines = check_lines()
+	if not bad_lines == {}:
+		print ("Spurious space: not possible to commit (except with -n)")
+		print_bad_lines(bad_lines)
+		sys.exit(1)
+	else:
+		sys.exit(0)
+			
+
+__main__()
