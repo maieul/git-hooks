@@ -8,8 +8,8 @@ import os
 import re
 import sys
 
-def add_bad_line(bad_lines,file,line_number,line):
-	"""Add a bad line to the list of bad lines"""
+def add_bade_line(bad_lines,file,line_number,line):
+	"""Add a bade line to the list of bade lines"""
 	if file in bad_lines:
 		bad_lines[file].append((line_number,line))
 	else:
@@ -40,7 +40,7 @@ def check_lines():
 		elif line[0] == "+":
 			check = check_line(line)
 			if not check:
-				bad_lines = add_bad_line(bad_lines,file,line_number,line)
+				bad_lines = add_bade_line(bad_lines,file,line_number,line)
 	return bad_lines
 
 def check_line(line):
@@ -48,7 +48,7 @@ def check_line(line):
 	
 	line = line.replace("\%","")	# Don't look for protected %  
 	
-	if line == "\n": 			# Allow empty line
+	if line == "+\n": 			# Allow empty line
 		return True
 	
 	elif "%" not in line: 		# If not % -> problem
@@ -58,7 +58,6 @@ def check_line(line):
 		return False
 	else:
 		return True
-
 def print_bad_lines(bad_lines):
 	"""Print the bad_lines"""
 	for file in bad_lines:
