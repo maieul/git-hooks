@@ -34,7 +34,7 @@ def change_line_number(line_number,line):
 
 def check_lines():
 	""" Check all modified lines"""
-	to_be_checked = ["dtx","sty","bbx","cbx","lbx"]
+	to_be_checked = ["dtx","sty","cls","bbx","cbx","lbx"]
 	diff = os.popen("git diff  --cached")
 	bad_lines ={}
 	line_number = 0
