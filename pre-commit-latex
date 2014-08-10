@@ -3,6 +3,8 @@
 """That is a pre-commit hook to check spurious space in .dtx file
 It allows empty line, but not line not finished by %.
 
+Maïeul Rouquette 2014-....
+v 1.0.0
 Licence GPl3 https://www.gnu.org/licenses/gpl-3.0.txt
 """
 
