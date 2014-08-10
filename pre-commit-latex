@@ -24,7 +24,7 @@ def add_bad_line(bad_lines,file,line_number,line):
 def change_line_number(line_number,line):
 	"""Change line number, depending of the current line"""
 	if line[0:2] == "@@": # line number
-		line_number = re.findall("\+(\d+),",line)
+		line_number = re.findall("\+(\d+),?",line)
 		line_number = int(line_number[0]) -1
 	elif not line[0] == "-" and not line[0:1] == "\\":
 		line_number = line_number + 1
