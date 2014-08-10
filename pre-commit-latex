@@ -5,8 +5,11 @@ It allows empty line, but not line not finished by %.
 """
 
 import os
+import os.path
 import re
 import sys
+
+to_be_checked = ["dtx","sty","bbx","cbx","lbx"]
 
 def add_bade_line(bad_lines,file,line_number,line):
 	"""Add a bade line to the list of bade lines"""
@@ -27,7 +30,7 @@ def change_line_number(line_number,line):
 
 def check_lines():
 	""" Check all modified lines"""
-	diff = os.popen("git diff  --cached *dtx")
+	diff = os.popen("git diff  --cached")
 	bad_lines ={}
 	line_number = 0
 	file = ""
@@ -37,7 +40,8 @@ def check_lines():
 		# what is the file?
 		if line[:6] == "+++ b/":
 			file = line[6:]
-		elif line[0] == "+":
+			extension = os.path.splitext(file)[1][1:]
+		elif line[0] == "+" and extension in to_be_checked:
 			check = check_line(line)
 			if not check:
 				bad_lines = add_bade_line(bad_lines,file,line_number,line)
