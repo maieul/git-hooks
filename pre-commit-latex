@@ -11,7 +11,7 @@ import os.path
 import re
 import sys
 
-to_be_checked = ["dtx","sty","bbx","cbx","lbx"]
+
 
 def add_bad_line(bad_lines,file,line_number,line):
 	"""Add a bad line to the list of bad lines"""
@@ -32,6 +32,7 @@ def change_line_number(line_number,line):
 
 def check_lines():
 	""" Check all modified lines"""
+	to_be_checked = ["dtx","sty","bbx","cbx","lbx"]
 	diff = os.popen("git diff  --cached")
 	bad_lines ={}
 	line_number = 0
@@ -41,9 +42,10 @@ def check_lines():
 		line_number = change_line_number(line_number,line)
 		# what is the file?
 		if line[:6] == "+++ b/":
-			file = line[6:]
+			file = line[6:-1]
 			extension = os.path.splitext(file)[1][1:]
 		elif line[0] == "+" and extension in to_be_checked:
+			print ("sncf")
 			check = check_line(line)
 			if not check:
 				bad_lines = add_bad_line(bad_lines,file,line_number,line)
@@ -67,7 +69,7 @@ def check_line(line):
 def print_bad_lines(bad_lines):
 	"""Print the bad_lines"""
 	for file in bad_lines:
-		print (file[:-1]+":")
+		print (file+":")
 		for line in bad_lines[file]:
 			print ("\t l." + str(line[0]) + ": " + line[1][1:-1])
 	
