@@ -71,7 +71,7 @@ def print_bad_lines(bad_lines):
 	for file in bad_lines:
 		print (file+":")
 		for line in bad_lines[file]:
-			print ("\t l." + str(line[0]) + ": " + line[1][1:-1])
+			print ("\t l." + str(line[0]) + ": \x1b[31m" + line[1][1:-1] + "\x1b[0m")
 	
 def __main__():
 	"""Main function: calls the check to bad line, print them if need, and return exit if error"""
