@@ -4,7 +4,7 @@
 It allows empty line, but not line not finished by %.
 
 Maïeul Rouquette 2014-....
-v 1.0.0
+v 1.0.1
 Licence GPl3 https://www.gnu.org/licenses/gpl-3.0.txt
 """
 
@@ -47,7 +47,6 @@ def check_lines():
 			file = line[6:-1]
 			extension = os.path.splitext(file)[1][1:]
 		elif line[0] == "+" and extension in to_be_checked:
-			print ("sncf")
 			check = check_line(line)
 			if not check:
 				bad_lines = add_bad_line(bad_lines,file,line_number,line)
