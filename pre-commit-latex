@@ -4,7 +4,7 @@
 It allows empty line, but not line not finished by %.
 
 Maïeul Rouquette 2014-....
-v 1.0.1
+v 1.0.2
 Licence GPl3 https://www.gnu.org/licenses/gpl-3.0.txt
 """
 
@@ -34,7 +34,7 @@ def change_line_number(line_number,line):
 
 def check_lines():
 	""" Check all modified lines"""
-	to_be_checked = ["dtx","sty","cls","bbx","cbx","lbx"]
+	to_be_checked = ["dtx","sty","bbx","cbx","lbx"]
 	diff = os.popen("git diff  --cached")
 	bad_lines ={}
 	line_number = 0
@@ -43,9 +43,12 @@ def check_lines():
 	for line in diff:
 		line_number = change_line_number(line_number,line)
 		# what is the file?
-		if line[:6] == "+++ b/":
+		if  "+++ b/" in line:
 			file = line[6:-1]
 			extension = os.path.splitext(file)[1][1:]
+		elif  "++ /dev/null" in line:
+			extension = ""
+			file = ""
 		elif line[0] == "+" and extension in to_be_checked:
 			check = check_line(line)
 			if not check:
