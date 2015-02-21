@@ -4,7 +4,7 @@
 It allows empty line, but not line not finished by %.
 
 Maïeul Rouquette 2014-....
-v 1.0.2
+v 1.1.0
 Licence GPl3 https://www.gnu.org/licenses/gpl-3.0.txt
 """
 
