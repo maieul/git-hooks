@@ -20,8 +20,8 @@ commands = {
         "cs_cmd":"Don't use \ inside \cs command",
         "macro_env":{
             "indent":"bad indent before \\begin{macro} or \end{macro}",
-            "pairing":"\\begin{macro} without \end{macro}",
-            "#2":"\\begin{macro} without optional argument"
+            "pairing":"\\begin{macro} without \end{macro} (or vice-versa)",
+            "#2":"\\begin{macro} without macro name"
         }
     }
 # General code
