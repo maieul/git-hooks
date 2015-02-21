@@ -69,7 +69,7 @@ def check_line(line,line_number,file_name):
         check = f(line,line_number,file_name)
         if check==False:
             results[cmd] = True
-        elif isinstance(check,list):
+        elif isinstance(check,list) and not check==[]:
             results[cmd] = check
     return results
 # Tests
