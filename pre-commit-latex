@@ -15,16 +15,10 @@ import sys
 
 # Setting
 to_be_checked = ["dtx","sty","bbx","cbx","lbx"]
-commands = [
-    {
-        "name":"end_line_percent_signe",
-        "warning":"Spurious space"
-    },
-    {
-        "name":"cs_cmd",
-        "warning":"Don't use \ inside \cs command"
+commands = {
+        "end_line_percent_signe":"Spurious space",
+        "cs_cmd":"Don't use \ inside \cs command",
     }
-    ]
 # General code
 def change_line_number(line_number,line):
     """Change line number, depending of the current line"""
@@ -35,49 +29,50 @@ def change_line_number(line_number,line):
         line_number = line_number + 1
     return line_number 
 
+lines_results ={}#global, bad, I have to find an other way. Key = filename_linenumber. content : see check_lines 
 def check_lines():
     """ Check all modified lines"""
     diff = os.popen("git diff  --cached")
-    lines_results =[]
     line_number = 0
-    file = ""
+    file_name = ""
     
     for line in diff:
         line_number = change_line_number(line_number,line)
         # what is the file?
         if  "+++ b/" in line:
-            file = line[6:-1]
-            extension = os.path.splitext(file)[1][1:]
+            file_name = line[6:-1]
+            extension = os.path.splitext(file_name)[1][1:]
         elif  "++ /dev/null" in line:
             extension = ""
-            file = ""
+            file_name = ""
         elif line[0] == "+" and extension in to_be_checked:
-            check = check_line(line,line_number)
-            lines_results.append({
+            check = check_line(line,line_number,file_name)
+            lines_results[file_name+"_"+str(line_number)]={
                  "line_number":line_number, 
                  "content":line,
                  "results":check,
-                 "file":file
-                 })
+                 "file_name":file_name
+                 }
     return lines_results
 
-def check_line(line,line_number):
+def check_line(line,line_number,file_name):
     """Check individual added line"""
-    results = []
+    results = {}
 
     for cmd in commands: #Use all commands, keep results
-        f = getattr(sys.modules[__name__],"check_"+cmd["name"])
-        check = f(line,line_number)
-        if not check:
-            results.append(cmd["warning"])
-    
+        f = getattr(sys.modules[__name__],"check_"+cmd)
+        check = f(line,line_number,file_name)
+        if check==False:
+            results[cmd] = True
+        elif isinstance(check,list):
+            results[cmd] = check
     return results
 # Tests
-def check_cs_cmd(line,line_number):
+def check_cs_cmd(line,line_number,file_name):
     """Check we don't start \cs argument by a \\"""
     return "\cs{\\" not in line
 
-def check_end_line_percent_signe(line,line_number):
+def check_end_line_percent_signe(line,line_number,file_name):
     """"Check line finish by %"""
 
     line = line.replace("\%","")    # Don't look for protected %  
@@ -98,16 +93,23 @@ def __main__():
     """Main function: calls the check to bad line, print them if need, and return exit if error"""
     lines_results = check_lines()
     exit = 0 #Set to 1 if we have ONE bad line. 
-    seen_files=[]
-    for line in lines_results:
+    seen_file_names=[]
+    for line_result in lines_results:
+        line= lines_results[line_result]
         if line["results"]!={}: #there is some error 
             exit=1
-            if line["file"] not in seen_files:
-                 seen_files.append(line["file"])
-                 print (line["file"])
+            if line["file_name"] not in seen_file_names:
+                 seen_file_names.append(line["file_name"])
+                 print (line["file_name"])
             print ("\x1b[31m\tl."+ str(line["line_number"]) + ": " + line["content"][:-1])
+            
+            results = line["results"]
             for error in line["results"]:
-                print ("\t\t " + error )
+                if results[error] == True:
+                    print ("\t\t " + commands[error])
+                else:
+                    for e in results[error]:
+                        print ("\t\t " + commands[error][e])
             print("\x1b[0m")
     sys.exit(exit)
 
