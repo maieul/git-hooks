@@ -13,79 +13,95 @@ import os.path
 import re
 import sys
 
-
-
-def add_bad_line(bad_lines,file,line_number,line):
-	"""Add a bad line to the list of bad lines"""
-	if file in bad_lines:
-		bad_lines[file].append((line_number,line))
-	else:
-		bad_lines[file] = [(line_number,line)]
-	return bad_lines
+commands = [
+    {
+        "name":"line_percent_signe",
+        "warning":"Spurious space"
+        }
+        ]
 
 def change_line_number(line_number,line):
-	"""Change line number, depending of the current line"""
-	if line[0:2] == "@@": # line number
-		line_number = re.findall("\+(\d+),?",line)
-		line_number = int(line_number[0]) -1
-	elif not line[0] == "-" and not line[0:1] == "\\":
-		line_number = line_number + 1
-	return line_number 
+    """Change line number, depending of the current line"""
+    if line[0:2] == "@@": # line number
+        line_number = re.findall("\+(\d+),?",line)
+        line_number = int(line_number[0]) -1
+    elif not line[0] == "-" and not line[0:1] == "\\":
+        line_number = line_number + 1
+    return line_number 
 
 def check_lines():
-	""" Check all modified lines"""
-	to_be_checked = ["dtx","sty","bbx","cbx","lbx"]
-	diff = os.popen("git diff  --cached")
-	bad_lines ={}
-	line_number = 0
-	file = ""
-	
-	for line in diff:
-		line_number = change_line_number(line_number,line)
-		# what is the file?
-		if  "+++ b/" in line:
-			file = line[6:-1]
-			extension = os.path.splitext(file)[1][1:]
-		elif  "++ /dev/null" in line:
-			extension = ""
-			file = ""
-		elif line[0] == "+" and extension in to_be_checked:
-			check = check_line(line)
-			if not check:
-				bad_lines = add_bad_line(bad_lines,file,line_number,line)
-	return bad_lines
+    """ Check all modified lines"""
+    to_be_checked = ["dtx","sty","bbx","cbx","lbx"]
+    diff = os.popen("git diff  --cached")
+    lines_results =[]
+    line_number = 0
+    file = ""
+    
+    for line in diff:
+        line_number = change_line_number(line_number,line)
+        # what is the file?
+        if  "+++ b/" in line:
+            file = line[6:-1]
+            extension = os.path.splitext(file)[1][1:]
+        elif  "++ /dev/null" in line:
+            extension = ""
+            file = ""
+        elif line[0] == "+" and extension in to_be_checked:
+            check = check_line(line,line_number)
+            lines_results.append({
+                 "line_number":line_number, 
+                 "content":line,
+                 "results":check,
+                 "file":file
+                 })
+    return lines_results
 
-def check_line(line):
-	"""Check individual added line"""
-	
-	line = line.replace("\%","")	# Don't look for protected %  
-	
-	if line == "+\n": 			# Allow empty line
-		return True
-	
-	elif "%" not in line: 		# If not % -> problem
-		return False
+def check_line(line,line_number):
+    """Check individual added line"""
+    results = []
 
-	elif re.search ("\s+%",line): # Spaces before % -> problem 
-		return False
-	else:
-		return True
-def print_bad_lines(bad_lines):
-	"""Print the bad_lines"""
-	for file in bad_lines:
-		print (file+":")
-		for line in bad_lines[file]:
-			print ("\t l." + str(line[0]) + ": \x1b[31m" + line[1][1:-1] + "\x1b[0m")
-	
+    for cmd in commands: #Use all commands, keep results
+        f = getattr(sys.modules[__name__],"check_"+cmd["name"])
+        check = f(line,line_number)
+        if not check:
+            results.append(cmd["warning"])
+    
+    return results
+
+def check_line_percent_signe(line,line_number):
+    """"Check line finish by %"""
+
+    line = line.replace("\%","")    # Don't look for protected %  
+    
+    if line == "+\n":             # Allow empty line
+        return True
+    
+    elif "%" not in line:         # If not % -> problem
+        return False
+
+    elif re.search ("\s+%",line): # Spaces before % -> problem 
+        return False
+    else:
+        return True
+
+#print ("\t l." + str(line[0]) + ": \x1b[31m" + line[1][1:-1] + "\x1b[0m")
+    
 def __main__():
-	"""Main function: calls the check to bad line, print them if need, and return exit if error"""
-	bad_lines = check_lines()
-	if not bad_lines == {}:
-		print ("Spurious space: not possible to commit (except with -n)")
-		print_bad_lines(bad_lines)
-		sys.exit(1)
-	else:
-		sys.exit(0)
-			
+    """Main function: calls the check to bad line, print them if need, and return exit if error"""
+    lines_results = check_lines()
+    exit = 0 #Set to 1 if we have ONE bad line. 
+    seen_files=[]
+    for line in lines_results:
+        if line["results"]!={}: #there is some error 
+            exit=1
+            if line["file"] not in seen_files:
+                 seen_files.append(line["file"])
+                 print (line["file"])
+            print ("\x1b[31m\tl."+ str(line["line_number"]) + ": " + line["content"][:-1])
+            for error in line["results"]:
+                print ("\t\t " + error )
+            print("\x1b[0m")
+    sys.exit(exit)
+
 
 __main__()
