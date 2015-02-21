@@ -25,7 +25,7 @@ commands = [
         "warning":"Don't use \ inside \cs command"
     }
     ]
-# Code
+# General code
 def change_line_number(line_number,line):
     """Change line number, depending of the current line"""
     if line[0:2] == "@@": # line number
@@ -72,7 +72,7 @@ def check_line(line,line_number):
             results.append(cmd["warning"])
     
     return results
-
+# Tests
 def check_cs_cmd(line,line_number):
     """Check we don't start \cs argument by a \\"""
     return "\cs{\\" not in line
@@ -92,6 +92,8 @@ def check_end_line_percent_signe(line,line_number):
         return False
     else:
         return True
+
+# Main function
 def __main__():
     """Main function: calls the check to bad line, print them if need, and return exit if error"""
     lines_results = check_lines()
