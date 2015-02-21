@@ -22,6 +22,10 @@ commands = {
             "indent":"bad indent before \\begin{macro} or \end{macro}",
             "pairing":"\\begin{macro} without \end{macro} (or vice-versa)",
             "#2":"\\begin{macro} without macro name"
+            },
+        "macrocode_env":{
+            "indent":"bad indent before \\begin{macrocode} or \end{macrocode}",
+            "pairing":"\\begin{macrocode} without \end{macrocode} (or vice-versa)",
         }
     }
 # General code
@@ -118,6 +122,52 @@ def check_macro_env(line,line_number,file_name):
             lines_results[file_name+"_"+begin_pairing]["results"]["macro_env"].remove("pairing")
             if lines_results[file_name+"_"+begin_pairing]["results"]["macro_env"] ==[]:
                 del(lines_results[file_name+"_"+begin_pairing]["results"]["macro_env"])
+        except:
+            errors.append("pairing")
+        return errors
+    else:
+        return True
+
+begin_macrocode ={} # keys file name, content = list of current \begin{macrocode} not closed.
+def check_macrocode_env(line,line_number,file_name):
+    """Check macrocode environnment:
+        a) only one space between % and \\begin{macrocode}
+        b) don't forget arg two
+        c) pairing setting : each \begin{macrocode} must have \end{macrocode}
+    """
+    line = line[1:]#delete the inital +
+    begin = "\\begin{macrocode}"
+    end = "\\end{macrocode}"
+    # only for line concerning macrocode env
+    errors = []
+    if begin in line:
+        
+        # Check only one space after %
+        normal_indent = "%    \\begin{macrocode}"
+        if line[:len(normal_indent)] != normal_indent:
+            errors.append("indent")
+
+        # we think its not paired before anyone paired
+        errors.append("pairing")
+        if file_name in begin_macrocode:
+            begin_macrocode[file_name].append(str(line_number))
+        else:
+            begin_macrocode[file_name]=[str(line_number)]
+
+        return errors
+    elif end in line:
+        
+        #check only 
+        normal_indent = "%    \end{macrocode}"
+        if line[:len(normal_indent)] != normal_indent:
+            errors.append("indent")
+        
+        #correct pairing
+        try:
+            begin_pairing = begin_macrocode[file_name].pop()#get the line of the \begin{macrocode}
+            lines_results[file_name+"_"+begin_pairing]["results"]["macrocode_env"].remove("pairing")
+            if lines_results[file_name+"_"+begin_pairing]["results"]["macrocode_env"] ==[]:
+                del(lines_results[file_name+"_"+begin_pairing]["results"]["macrocode_env"])
         except:
             errors.append("pairing")
         return errors
