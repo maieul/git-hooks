@@ -17,7 +17,7 @@ import sys
 to_be_checked = ["dtx","sty","bbx","cbx","lbx"]
 commands = [
     {
-        "name":"line_percent_signe",
+        "name":"end_line_percent_signe",
         "warning":"Spurious space"
         }
         ]
@@ -69,7 +69,7 @@ def check_line(line,line_number):
     
     return results
 
-def check_line_percent_signe(line,line_number):
+def check_end_line_percent_signe(line,line_number):
     """"Check line finish by %"""
 
     line = line.replace("\%","")    # Don't look for protected %  
