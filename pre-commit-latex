@@ -13,13 +13,15 @@ import os.path
 import re
 import sys
 
+# Setting
+to_be_checked = ["dtx","sty","bbx","cbx","lbx"]
 commands = [
     {
         "name":"line_percent_signe",
         "warning":"Spurious space"
         }
         ]
-
+# Code
 def change_line_number(line_number,line):
     """Change line number, depending of the current line"""
     if line[0:2] == "@@": # line number
@@ -31,7 +33,6 @@ def change_line_number(line_number,line):
 
 def check_lines():
     """ Check all modified lines"""
-    to_be_checked = ["dtx","sty","bbx","cbx","lbx"]
     diff = os.popen("git diff  --cached")
     lines_results =[]
     line_number = 0
