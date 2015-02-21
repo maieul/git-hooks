@@ -19,8 +19,12 @@ commands = [
     {
         "name":"end_line_percent_signe",
         "warning":"Spurious space"
-        }
-        ]
+    },
+    {
+        "name":"cs_cmd",
+        "warning":"Don't use \ inside \cs command"
+    }
+    ]
 # Code
 def change_line_number(line_number,line):
     """Change line number, depending of the current line"""
@@ -68,6 +72,10 @@ def check_line(line,line_number):
             results.append(cmd["warning"])
     
     return results
+
+def check_cs_cmd(line,line_number):
+    """Check we don't start \cs argument by a \\"""
+    return "\cs{\\" not in line
 
 def check_end_line_percent_signe(line,line_number):
     """"Check line finish by %"""
