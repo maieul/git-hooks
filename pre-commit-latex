@@ -22,12 +22,12 @@ Enjoy !
 Only for new line, these properties are checked:
     - All line must finish by a %, without space before.
     Empty line are allowed, but not line with blank space.
-    - \\begin{macro} and \end{macro} must be paired.
-    - \\begin{macrocode} and \end{macrocode} must be paired.
-    - \\begin{macro} must have a second argument.
-    - 1 space must be printed between % and \\begin{macro} of \end{macro}. % Must be the first line character.
-    - 4 spaces must be printed between % and \\begin{macrocode} or \end{macrocode}.
-    - \cs argument must NOT start by an \\"
+    - \begin{macro} and \end{macro} must be paired.
+    - \begin{macrocode} and \end{macrocode} must be paired.
+    - \begin{macro} must have a second argument.
+    - 1 space must be printed between % and \begin{macro} of \end{macro}. % Must be the first line character.
+    - 4 spaces must be printed between % and \begin{macrocode} or \end{macrocode}.
+    - \cs argument must NOT start by an \
 
 === Licence and copyright
 Maïeul Rouquette 2014-....
