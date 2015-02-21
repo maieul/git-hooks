@@ -1,7 +1,23 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""That is a pre-commit hook to check spurious space in .dtx files
-It allows empty line, but not line not finished by %.
+"""That is a pre-commit hook to check basic LaTeX syntaxe for develloper of package.
+
+File checked:
+    - .sty
+    - .dtx
+    - .bbx
+    - .cbx
+    - .lbx
+
+What are checked, only for new line:
+    - All line must finish by a %, without space before.
+    Empty line are allowed, but not line with blank space.
+    - \\begin{macro} and \end{macro} must be paired.
+    - \\begin{macrocode} and \end{macrocode} must be paired.
+    - \\begin{macro} must have a second argument.
+    - 1 space must be printed between % and \\begin{macro} of \end{macro}. % Must be the first line character.
+    - 4 spaces must be printed between % and \\begin{macrocode} or \end{macrocode}.
+    - \cs argument must NOT start by an \\"
 
 Maïeul Rouquette 2014-....
 v 1.1.0
