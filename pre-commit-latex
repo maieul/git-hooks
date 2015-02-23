@@ -1,13 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Pre-commit hook for LaTeX package developpers 
+"""Pre-commit hook for LaTeX package developers 
 
 
 === What it is ?
-A pre-commit hook to check basic LaTeX syntaxe for develloper of package.
+A pre-commit hook to check basic LaTeX syntax for developer of package.
 
 ==== How to install
-Copy pre-commit in the .git/.hooks file
+Copy pre-commit in the .git/hooks file
 Add execution right (chmod +x)
 Enjoy !
 
