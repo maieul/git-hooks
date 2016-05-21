@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Pre-commit hook for LaTeX package developers 
+"""Pre-commit hook for LaTeX package developers
 
 
 === What it is ?
@@ -31,7 +31,7 @@ Only for new line, these properties are checked:
 
 === Licence and copyright
 Maïeul Rouquette 2014-....
-v 1.1.0
+v 1.1.1
 Licence GPl3 https://www.gnu.org/licenses/gpl-3.0.txt
 
 === Help and github repository
@@ -69,15 +69,15 @@ def change_line_number(line_number,line):
         line_number = int(line_number[0]) -1
     elif not line[0] == "-" and not line[0:1] == "\\":
         line_number = line_number + 1
-    return line_number 
+    return line_number
 
-lines_results ={}#global, bad, I have to find an other way. Key = filename_linenumber. content : see check_lines 
+lines_results ={}#global, bad, I have to find an other way. Key = filename_linenumber. content : see check_lines
 def check_lines():
     """ Check all modified lines"""
     diff = os.popen("git diff  --cached")
     line_number = 0
     file_name = ""
-    
+
     for line in diff:
         line_number = change_line_number(line_number,line)
         # what is the file_name?
@@ -90,7 +90,7 @@ def check_lines():
         elif line[0] == "+" and extension in to_be_checked:
             check = check_line(line,line_number,file_name)
             lines_results[file_name+"_"+str(line_number)]={
-                 "line_number":line_number, 
+                 "line_number":line_number,
                  "content":line,
                  "results":check,
                  "file_name":file_name
@@ -124,12 +124,12 @@ def check_macro_env(line,line_number,file_name):
     # only for line concerning macro env
     errors = []
     if begin in line:
-        
+
         # Check only one space after %
         normal_indent = "% \\begin{macro}"
         if line[:len(normal_indent)] != normal_indent:
             errors.append("indent")
-        
+
         #Check there is second argument
         if line.count("{") != 2 or line.count("}") != 2:
             errors.append("#2")
@@ -143,12 +143,12 @@ def check_macro_env(line,line_number,file_name):
 
         return errors
     elif end in line:
-        
-        #check only 
+
+        #check only
         normal_indent = "% \end{macro}"
         if line[:len(normal_indent)] != normal_indent:
             errors.append("indent")
-        
+
         #correct pairing
         try:
             begin_pairing = begin_macro[file_name].pop()#get the line of the \begin{macro}
@@ -174,7 +174,7 @@ def check_macrocode_env(line,line_number,file_name):
     # only for line concerning macrocode env
     errors = []
     if begin in line:
-        
+
         # Check only one space after %
         normal_indent = "%    \\begin{macrocode}"
         if line[:len(normal_indent)] != normal_indent:
@@ -189,12 +189,12 @@ def check_macrocode_env(line,line_number,file_name):
 
         return errors
     elif end in line:
-        
-        #check only 
+
+        #check only
         normal_indent = "%    \end{macrocode}"
         if line[:len(normal_indent)] != normal_indent:
             errors.append("indent")
-        
+
         #correct pairing
         try:
             begin_pairing = begin_macrocode[file_name].pop()#get the line of the \begin{macrocode}
@@ -215,15 +215,15 @@ def check_cs_cmd(line,line_number,file_name):
 def check_end_line_percent_signe(line,line_number,file_name):
     """"Check line finish by %"""
 
-    line = line.replace("\%","")    # Don't look for protected %  
-    
+    line = line.replace("\%","")    # Don't look for protected %
+
     if line == "+\n":             # Allow empty line
         return True
-    
+
     elif "%" not in line:         # If not % -> problem
         return False
 
-    elif re.search ("\s+%",line): # Spaces before % -> problem 
+    elif re.search ("\s+%",line): # Spaces before % -> problem
         return False
     else:
         return True
@@ -232,17 +232,17 @@ def check_end_line_percent_signe(line,line_number,file_name):
 def __main__():
     """Main function: calls the check to bad line, print them if need, and return exit if error"""
     lines_results = check_lines()
-    exit = 0 #Set to 1 if we have ONE bad line. 
+    exit = 0 #Set to 1 if we have ONE bad line.
     seen_file_names=[]
-    for line_result in lines_results:
+    for line_result in sorted(lines_results):
         line= lines_results[line_result]
-        if line["results"]!={}: #there is some error 
+        if line["results"]!={}: #there is some error
             exit=1
             if line["file_name"] not in seen_file_names:
                  seen_file_names.append(line["file_name"])
                  print (line["file_name"])
             print ("\x1b[31m\tl."+ str(line["line_number"]) + ": " + line["content"][:-1])
-            
+
             results = line["results"]
             for error in line["results"]:
                 if results[error] == True:
