@@ -31,7 +31,7 @@ Only for new line, these properties are checked:
 
 === Licence and copyright
 Maïeul Rouquette 2014-....
-v 1.1.2
+v 1.1.3
 Licence GPl3 https://www.gnu.org/licenses/gpl-3.0.txt
 
 === Help and github repository
@@ -135,10 +135,11 @@ def check_macro_env(line,line_number,file_name):
 
         # we think its not paired before anyone paired
         errors.append("pairing")
+
         if file_name in begin_macro:
-            begin_macro[file_name].append(str(line_number))
+            begin_macro[file_name].append(line_number)
         else:
-            begin_macro[file_name]=[str(line_number)]
+            begin_macro[file_name]=[line_number]
 
         return errors
     elif end in line:
@@ -151,9 +152,9 @@ def check_macro_env(line,line_number,file_name):
         #correct pairing
         try:
             begin_pairing = begin_macro[file_name].pop()#get the line of the \begin{macro}
-            lines_results[file_name+"_"+begin_pairing]["results"]["macro_env"].remove("pairing")
-            if lines_results[file_name+"_"+begin_pairing]["results"]["macro_env"] ==[]:
-                del(lines_results[file_name+"_"+begin_pairing]["results"]["macro_env"])
+            lines_results[file_name][begin_pairing]["results"]["macro_env"].remove("pairing")
+            if lines_results[file_name][begin_pairing]["results"]["macro_env"] ==[]:
+                del(lines_results[file_name][begin_pairing]["results"]["macro_env"])
         except:
             errors.append("pairing")
         return errors
@@ -182,9 +183,9 @@ def check_macrocode_env(line,line_number,file_name):
         # we think its not paired before anyone paired
         errors.append("pairing")
         if file_name in begin_macrocode:
-            begin_macrocode[file_name].append(str(line_number))
+            begin_macrocode[file_name].append(line_number)
         else:
-            begin_macrocode[file_name]=[str(line_number)]
+            begin_macrocode[file_name]=[line_number]
 
         return errors
     elif end in line:
@@ -197,9 +198,9 @@ def check_macrocode_env(line,line_number,file_name):
         #correct pairing
         try:
             begin_pairing = begin_macrocode[file_name].pop()#get the line of the \begin{macrocode}
-            lines_results[file_name+"_"+begin_pairing]["results"]["macrocode_env"].remove("pairing")
-            if lines_results[file_name+"_"+begin_pairing]["results"]["macrocode_env"] ==[]:
-                del(lines_results[file_name+"_"+begin_pairing]["results"]["macrocode_env"])
+            lines_results[file_name][begin_pairing]["results"]["macrocode_env"].remove("pairing")
+            if lines_results[file_name][begin_pairing]["results"]["macrocode_env"] ==[]:
+                del(lines_results[file_name][begin_pairing]["results"]["macrocode_env"])
         except:
             errors.append("pairing")
         return errors
