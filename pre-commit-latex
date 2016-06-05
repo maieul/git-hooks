@@ -31,7 +31,7 @@ Only for new line, these properties are checked:
 
 === Licence and copyright
 Maïeul Rouquette 2014-....
-v 1.1.1
+v 1.1.0
 Licence GPl3 https://www.gnu.org/licenses/gpl-3.0.txt
 
 === Help and github repository
@@ -77,20 +77,19 @@ def check_lines():
     diff = os.popen("git diff  --cached")
     line_number = 0
     file_name = ""
-
     for line in diff:
         line_number = change_line_number(line_number,line)
         # what is the file_name?
         if  "+++ b/" in line:
             file_name = line[6:-1]
             extension = os.path.splitext(file_name)[1][1:]
+            lines_results[file_name] ={}
         elif  "++ /dev/null" in line:
             extension = ""
             file_name = ""
         elif line[0] == "+" and extension in to_be_checked:
             check = check_line(line,line_number,file_name)
-            lines_results[file_name+"_"+str(line_number)]={
-                 "line_number":line_number,
+            lines_results[file_name][line_number]={
                  "content":line,
                  "results":check,
                  "file_name":file_name
@@ -233,24 +232,22 @@ def __main__():
     """Main function: calls the check to bad line, print them if need, and return exit if error"""
     lines_results = check_lines()
     exit = 0 #Set to 1 if we have ONE bad line.
-    seen_file_names=[]
-    for line_result in sorted(lines_results):
-        line= lines_results[line_result]
-        if line["results"]!={}: #there is some error
-            exit=1
-            if line["file_name"] not in seen_file_names:
-                 seen_file_names.append(line["file_name"])
-                 print (line["file_name"])
-            print ("\x1b[31m\tl."+ str(line["line_number"]) + ": " + line["content"][:-1])
+    for file_name in lines_results:
+        print (file_name)
+        for line_number in sorted(lines_results[file_name].keys()):
+            line = lines_results[file_name][line_number]
+            if line["results"]!={}: #there is some error
+                exit=1
+                print ("\x1b[31m\tl."+ str(line_number) + ": " + line["content"][:-1])
 
-            results = line["results"]
-            for error in line["results"]:
-                if results[error] == True:
-                    print ("\t\t " + commands[error])
-                else:
-                    for e in results[error]:
-                        print ("\t\t " + commands[error][e])
-            print("\x1b[0m")
+                results = line["results"]
+                for error in line["results"]:
+                    if results[error] == True:
+                        print ("\t\t " + commands[error])
+                    else:
+                        for e in results[error]:
+                            print ("\t\t " + commands[error][e])
+                print("\x1b[0m")
     sys.exit(exit)
 
 
