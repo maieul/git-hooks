@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Pre-commit hook for LaTeX package developers
+r"""Pre-commit hook for LaTeX package developers
 
 
 === What it is ?
@@ -31,7 +31,7 @@ Only for new line, these properties are checked:
 
 === Licence and copyright
 Maïeul Rouquette 2014-....
-v 1.1.2
+v 1.1.0
 Licence GPl3 https://www.gnu.org/licenses/gpl-3.0.txt
 
 === Help and github repository
@@ -50,22 +50,22 @@ import sys
 to_be_checked = ["dtx","sty","bbx","cbx","lbx"]
 commands = {
         "end_line_percent_signe":"Spurious space",
-        "cs_cmd":"Don't use \ inside \cs command",
+        "cs_cmd":r"Don't use \ inside \cs command",
         "macro_env":{
-            "indent":"bad indent before \\begin{macro} or \end{macro}",
-            "pairing":"\\begin{macro} without \end{macro} (or vice-versa)",
-            "#2":"\\begin{macro} without macro name"
+            "indent":r"bad indent before \begin{macro} or \end{macro}",
+            "pairing":r"\begin{macro} without \end{macro} (or vice-versa)",
+            "#2":r"\begin{macro} without macro name"
             },
         "macrocode_env":{
-            "indent":"bad indent before \\begin{macrocode} or \end{macrocode}",
-            "pairing":"\\begin{macrocode} without \end{macrocode} (or vice-versa)",
+            "indent":r"bad indent before \begin{macrocode} or \end{macrocode}",
+            "pairing":r"\begin{macrocode} without \end{macrocode} (or vice-versa)",
         }
     }
 # General code
 def change_line_number(line_number,line):
     """Change line number, depending of the current line"""
     if line[0:2] == "@@": # line number
-        line_number = re.findall("\+(\d+),?",line)
+        line_number = re.findall(r"\+(\d+),?",line)
         line_number = int(line_number[0]) -1
     elif not line[0] == "-" and not line[0:1] == "\\":
         line_number = line_number + 1
@@ -112,8 +112,8 @@ def check_line(line,line_number,file_name):
 
 begin_macro ={} # keys file name, content = list of current \begin{macro} not closed.
 def check_macro_env(line,line_number,file_name):
-    """Check macro environnment:
-        a) only one space between % and \\begin{macro}
+    r"""Check macro environnment:
+        a) only one space between % and \begin{macro}
         b) don't forget arg two
         c) pairing setting : each \begin{macro} must have \end{macro}
     """
@@ -145,7 +145,7 @@ def check_macro_env(line,line_number,file_name):
     elif end in line:
 
         #check only
-        normal_indent = "% \end{macro}"
+        normal_indent = r"% \end{macro}"
         if line[:len(normal_indent)] != normal_indent:
             errors.append("indent")
 
@@ -163,8 +163,8 @@ def check_macro_env(line,line_number,file_name):
 
 begin_macrocode ={} # keys file name, content = list of current \begin{macrocode} not closed.
 def check_macrocode_env(line,line_number,file_name):
-    """Check macrocode environnment:
-        a) only one space between % and \\begin{macrocode}
+    r"""Check macrocode environnment:
+        a) only one space between % and \begin{macrocode}
         b) don't forget arg two
         c) pairing setting : each \begin{macrocode} must have \end{macrocode}
     """
@@ -191,7 +191,7 @@ def check_macrocode_env(line,line_number,file_name):
     elif end in line:
 
         #check only
-        normal_indent = "%    \end{macrocode}"
+        normal_indent = r"%    \end{macrocode}"
         if line[:len(normal_indent)] != normal_indent:
             errors.append("indent")
 
@@ -209,13 +209,13 @@ def check_macrocode_env(line,line_number,file_name):
 
 
 def check_cs_cmd(line,line_number,file_name):
-    """Check we don't start \cs argument by a \\"""
-    return "\cs{\\" not in line
+    r"""Check we don't start \cs argument by a \\"""
+    return r"\cs{\\" not in line
 
 def check_end_line_percent_signe(line,line_number,file_name):
     """"Check line finish by %"""
 
-    line = line.replace("\%","")    # Don't look for protected %
+    line = line.replace(r"\%","")    # Don't look for protected %
 
     if line == "+\n":             # Allow empty line
         return True
@@ -223,7 +223,7 @@ def check_end_line_percent_signe(line,line_number,file_name):
     elif "%" not in line:         # If not % -> problem
         return False
 
-    elif re.search ("\s+%",line): # Spaces before % -> problem
+    elif re.search (r"\s+%",line): # Spaces before % -> problem
         return False
     else:
         return True
